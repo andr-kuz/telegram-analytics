@@ -1,0 +1,16 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Регистрация{% endblock %}
+
+{% block content %}
+    <form method="POST" class="form-group" name="register">
+        {% csrf_token %}
+        {{ register_form.as_p }}
+        <button type="submit" class="btn btn-success" name="register">Зарегистрироваться</button>
+    </form>
+    <form method="POST" class="form-group">
+        {% csrf_token %}
+        {{ login_form.as_p }}
+        <button type="submit" class="btn btn-success" name="login">Войти</button>
+    </form>
+{% endblock %}
