@@ -19,7 +19,7 @@ def handler(request):
                 data = form.cleaned_data
                 user = authenticate(username=data['username'], password=data['password'])
             else:
-                error = f'Неверные данные пользователя {data["username"]}'
+                error = f'Неверные данные пользователя'
 
         if 'error' in locals():
             messages.error(request, error)
