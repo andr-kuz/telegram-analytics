@@ -64,3 +64,7 @@ db.sqlite3
 ### Vim ###
 session.vim
 .undodir/
+[._]*.s[a-v][a-z]
+[._]*.sw[a-p]
+[._]s[a-v][a-z]
+[._]sw[a-p]

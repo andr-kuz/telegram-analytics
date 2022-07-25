@@ -29,7 +29,7 @@ def handler(request):
             return redirect('/')
     register_form = RegisterForm()
     login_form = LoginForm()
-    return render(request=request, template_name='user_auth/register.html', context={'register_form': register_form, 'login_form': login_form})
+    return render(request=request, template_name='user_auth/register_and_login.html', context={'register_form': register_form, 'login_form': login_form})
 
 def log_out(request):
     logout(request)
