@@ -1,8 +1,8 @@
 from django.urls import path, include
 from . import views
 
-app_name = 'user_profile'
+app_name = 'main'
 
 urlpatterns = [
-    path('', views.index, name='index')
+    path('', views.index, name='index'),
 ]

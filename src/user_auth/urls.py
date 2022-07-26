@@ -1,9 +1,10 @@
 from django.urls import path, include
+from django.contrib.auth.views import LogoutView
 from . import views
 
 app_name = 'user_auth'
 
 urlpatterns = [
-    path('login', views.handler, name='login'),
-    path('logout', views.log_out, name='logout'),
+    path('', views.handler, name='index'),
+    path('logout', LogoutView.as_view(), name='logout'),
 ]
