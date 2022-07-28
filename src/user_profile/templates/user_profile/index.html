@@ -3,5 +3,7 @@
 {% block title %}Профиль{% endblock %}
 
 {% block content %}
-  <h1>Вы аутентифицированы</h1>
+  <h1>Ваш профиль</h1>
+  <h2>Ваши воронки:</h2>
+  <p>У вас еще нет воронок. Давайте <a href="{% url 'user_profile:create_funnel:index' %}">Создадим первую</a></p>
 {% endblock %}

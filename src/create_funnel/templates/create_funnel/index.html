@@ -1,0 +1,190 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Создание воронки{% endblock %}
+
+{% block content %}
+<style>
+  #stepsList > div {
+    cursor: grab;
+  }
+
+  #stepsList > div * {
+    cursor: auto;
+  }
+</style>
+
+<h1>Создание воронки</h1>
+<div class="col-6 border">
+  <div class="col-12 border p-3">
+    <form method="POST" onsubmit="constructJSON(this); return false">
+      <div id="0" class="border p-3" data-type="subscribe">
+        <p>Введите название чата или канала, который хотите отслеживать</p>
+        <input type="text" placeholder="@mysuperchannel" name="track">
+      </div>
+      <div id="stepsList"></div>
+      <button>Отправить</button>
+    </form>
+  </div>
+  <div class="col-12 border p-3">
+    <form method="POST" id="add-step" onsubmit="addStep(this); return false;">
+      <label for="">Добавить шаг воронки. Отслеживать:
+        <select name="add-step-select">
+          <option value="comment">Комментарий к посту</option>
+          <option value="reaction">Реакцию</option>
+          <option value="pm">Личные сообщения</option>
+        </select>
+      </label>
+      <button>+</button>
+    </form>
+  </div>
+</div>
+<div class="col-6 border" id="json">
+</div>
+<div style="display: none;" id="reference">
+  <div data-type="comment" class="border p-3">
+    <h2>Комментарий к посту</h2>
+    <div class="mb-3">
+      <label class="form-label">Выберите содержимое комментария</label>
+      <select class="form-select" name="type" onchange="typeChanged(this, 'data-switch')">
+        <option value="message">Текст</option>
+        <option value="file">Файл</option>
+        <option value="image">Изображение</option>
+        <option value="video">Видео</option>
+      </select>
+    </div>
+    <div class="form-check form-switch">
+      <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault" onchange="switchAvailability(this, 'data-switch')">
+      <label class="form-check-label" for="flexSwitchCheckDefault">Своё содержимое</label>
+    </div>
+    <div class="mb-3" data-switch>
+      <label class="form-label d-none" data-message>Текст сообщения</label>
+      <label class="form-label d-none" data-file>Название файла</label>
+      <label class="form-label d-none" data-image>Название изображения</label>
+      <label class="form-label d-none" data-video>Название видео</label>
+      <input class="form-control d-none" type="text" name="content" placeholder="Поддерживаются регулярные выражения" data-message data-file data-image data-video disabled>
+    </div>
+    <div class="form-check form-switch">
+      <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault" onchange="switchAvailability(this, 'data-post-url')">
+      <label class="form-check-label" for="flexSwitchCheckDefault">Под конкретным постом</label>
+    </div>
+    <div class="mb-3" data-post-url>
+      <label class="form-label">Введите ссылку на пост</label>
+      <input class="form-control" type="text" name="misc" placeholder="Поддерживаются регулярные выражения" disabled>
+    </div>
+  </div>
+
+
+
+  <div data-type="pm" class="border p-3">
+    <p>Действие в переписке</p>
+    <label>Выберите действие</label>
+    <select name="type">
+      <option value="message">Текстовое сообщение</option>
+      <option value="file">Файл</option>
+      <option value="image">Изображение</option>
+      <option value="video">Видео</option>
+    </select>
+    <label>Маска сообщения. По умолчанию любое содержимое <input type="text" name="content"></label>
+    <label>Действие должно быть совершено пользователем? <input type="checkbox" name="misc"></label>
+  </div>
+  <div data-type="reaction" class="border p-3">
+    <p>Реакция</p>
+    <label>Где</label>
+    <select name="type">
+      <option value="pm">В переписке</option>
+      <option value="comment">К комментарию</option>
+      <option value="post">К посту</option>
+    </select>
+    <label>Какая реакция? По умолчанию любая <input type="text" name="content"></label>
+    <label>Реакция от пользователя? <input type="checkbox" name="misc"></label>
+  </div>
+</div>
+<script>
+  document.querySelectorAll('[onchange]').forEach(e => {
+      e.onchange()
+    })
+
+    const stepsList = document.querySelector('#stepsList')
+    function typeChanged(select, attrName) {
+        const parent = select.closest('div[data-type]')
+        const changeName = select.value
+        const switchParent = parent.querySelector(`div[${attrName}]`)
+        switchParent.querySelectorAll(':scope *').forEach(e => {
+            e.classList.add('d-none')
+            if (e.hasAttribute(`data-${changeName}`)) {
+                e.classList.remove('d-none')
+              }
+          })
+      }
+
+    function switchAvailability(checkbox, attrName) {
+        const parent = checkbox.closest('div[data-type]')
+        const switchParent = parent.querySelector(`div[${attrName}]`)
+        const inputs = switchParent.querySelectorAll('input, select, button').forEach(e => {
+            if (checkbox.checked) {
+                e.disabled = false;
+              } else {
+                  e.disabled = true;
+                }
+          })
+      }
+
+    function reorderSteps() {
+        let i = 1
+        const thereAreSteps = stepsList.querySelectorAll(':scope > div')
+        if (thereAreSteps) {
+            thereAreSteps.forEach(e => {
+                e.id = i
+                i += 1
+              })
+          }
+      }
+
+    function addStep(form) {
+        reorderSteps()
+        const formData = new FormData(form)
+        for (const pair of formData.entries()) {
+            if (pair[0] == 'add-step-select') {
+                let lastStep = stepsList.querySelector(':scope > div:last-of-type')
+                if (!lastStep) {
+                    lastStep = document.querySelector('div[id="0"]')
+                  }
+                const lastId = lastStep.id
+                const lastClassName = lastStep.className
+                const element = document.querySelector(`#reference [data-type="${pair[1]}"]`)
+                const nextStep = element.cloneNode(true)
+                nextStep.id = parseInt(lastId) + 1
+                let elementText = nextStep.innerHTML
+                elementText += '<button type="button" onclick="deleteStep(this)">X</button>'
+                nextStep.innerHTML = elementText
+                stepsList.append(nextStep)
+              }
+          }
+      }
+
+    function deleteStep(e) {
+        const parentDiv = e.closest('div[data-type]')
+        parentDiv.remove()
+        reorderSteps()
+      }
+
+    function constructJSON(form) {
+        let json = {}
+        form.querySelectorAll('div[id]:not([id="stepsList"])').forEach(e => {
+            json[e.id] = {}
+            const actionType = e.getAttribute('data-type')
+            json[e.id]['action'] = actionType
+          })
+    console.log(json)
+      }
+
+    $(function() {
+        $(stepsList).sortable({
+            axis: "y",
+            out: function (event, ui) {
+                reorderSteps()
+              }
+          });
+      });
+</script>
+{% endblock %}

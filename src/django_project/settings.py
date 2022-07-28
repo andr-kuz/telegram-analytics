@@ -39,9 +39,8 @@ INSTALLED_APPS = [
     'main',
     'user_profile',
     'user_auth',
+    'create_funnel',
 ]
-
-LOGOUT_REDIRECT_URL = '/'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
