@@ -38,75 +38,97 @@
     </form>
   </div>
 </div>
-<div class="col-6 border" id="json">
+<div class="col-6 border p-3">
+  <pre id="json"></pre>
 </div>
 <div style="display: none;" id="reference">
   <div data-type="comment" class="border p-3">
     <h2>Комментарий к посту</h2>
     <div class="mb-3">
       <label class="form-label">Выберите содержимое комментария</label>
-      <select class="form-select" name="type" onchange="typeChanged(this, 'data-switch')">
+      <select class="form-select" name="type">
+        <option value="any">Любой</option>
         <option value="message">Текст</option>
         <option value="file">Файл</option>
         <option value="image">Изображение</option>
         <option value="video">Видео</option>
       </select>
     </div>
-    <div class="form-check form-switch">
+    <div class="form-check form-switch mb-3">
       <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault" onchange="switchAvailability(this, 'data-switch')">
-      <label class="form-check-label" for="flexSwitchCheckDefault">Своё содержимое</label>
+      <label class="form-check-label" for="flexSwitchCheckDefault">Встречается в содержимом</label>
     </div>
     <div class="mb-3" data-switch>
-      <label class="form-label d-none" data-message>Текст сообщения</label>
-      <label class="form-label d-none" data-file>Название файла</label>
-      <label class="form-label d-none" data-image>Название изображения</label>
-      <label class="form-label d-none" data-video>Название видео</label>
-      <input class="form-control d-none" type="text" name="content" placeholder="Поддерживаются регулярные выражения" data-message data-file data-image data-video disabled>
+      <input class="form-control" type="text" name="content" placeholder="Поддерживаются регулярные выражения" disabled>
     </div>
-    <div class="form-check form-switch">
-      <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault" onchange="switchAvailability(this, 'data-post-url')">
-      <label class="form-check-label" for="flexSwitchCheckDefault">Под конкретным постом</label>
+    <div class="form-check form-switch mb-3">
+      <input class="form-check-input" type="checkbox" role="switch" onchange="switchAvailability(this, 'data-post-url')">
+      <label class="form-check-label">Под конкретным постом</label>
     </div>
     <div class="mb-3" data-post-url>
-      <label class="form-label">Введите ссылку на пост</label>
-      <input class="form-control" type="text" name="misc" placeholder="Поддерживаются регулярные выражения" disabled>
+      <input class="form-control" type="text" name="misc" placeholder="https://t.me/channelName/123" disabled>
     </div>
   </div>
-
-
-
   <div data-type="pm" class="border p-3">
-    <p>Действие в переписке</p>
-    <label>Выберите действие</label>
-    <select name="type">
-      <option value="message">Текстовое сообщение</option>
-      <option value="file">Файл</option>
-      <option value="image">Изображение</option>
-      <option value="video">Видео</option>
-    </select>
-    <label>Маска сообщения. По умолчанию любое содержимое <input type="text" name="content"></label>
-    <label>Действие должно быть совершено пользователем? <input type="checkbox" name="misc"></label>
+    <h2>Личное сообщение</h2>
+    <div class="mb-3">
+      <label class="form-label">Выберите содержимое личного сообщения</label>
+      <select class="form-select" name="type">
+        <option value="any">Любое</option>
+        <option value="message">Текст</option>
+        <option value="file">Файл</option>
+        <option value="image">Изображение</option>
+        <option value="video">Видео</option>
+      </select>
+    </div>
+    <div class="form-check form-switch mb-3">
+      <input class="form-check-input" type="checkbox" role="switch" onchange="switchAvailability(this, 'data-switch')">
+      <label class="form-check-label">Встречается в содержимом</label>
+    </div>
+    <div class="mb-3" data-switch>
+      <input class="form-control" type="text" name="content" placeholder="Поддерживаются регулярные выражения" disabled>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="radio" name="misc" checked>
+      <label class="form-check-label">
+        Сообщение от пользователя
+      </label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="radio" name="misc">
+      <label class="form-check-label">
+        Сообщение пользователю
+      </label>
+    </div>
   </div>
-  <div data-type="reaction" class="border p-3">
-    <p>Реакция</p>
-    <label>Где</label>
-    <select name="type">
-      <option value="pm">В переписке</option>
-      <option value="comment">К комментарию</option>
-      <option value="post">К посту</option>
-    </select>
-    <label>Какая реакция? По умолчанию любая <input type="text" name="content"></label>
-    <label>Реакция от пользователя? <input type="checkbox" name="misc"></label>
+<div data-type="reaction" class="border p-3">
+    <h2>Реакция</h2>
+    <div class="mb-3">
+      <label class="form-label">На что должна быть реакция</label>
+      <select class="form-select" name="type">
+        <option value="any">Любое</option>
+        <option value="pm">Личное сообщение</option>
+        <option value="post">Пост</option>
+      </select>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Какая реакция</label>
+      <select class="form-select" name="type">
+        <option value="any">Любая</option>
+        <option value="heart">Heart</option>
+        <option value="fire">Fire</option>
+      </select>
+    </div>
   </div>
 </div>
 <script>
   document.querySelectorAll('[onchange]').forEach(e => {
       e.onchange()
     })
-
     const stepsList = document.querySelector('#stepsList')
+
     function typeChanged(select, attrName) {
-        const parent = select.closest('div[data-type]')
+        const parent = select.closest('[data-type]')
         const changeName = select.value
         const switchParent = parent.querySelector(`div[${attrName}]`)
         switchParent.querySelectorAll(':scope *').forEach(e => {
@@ -118,7 +140,7 @@
       }
 
     function switchAvailability(checkbox, attrName) {
-        const parent = checkbox.closest('div[data-type]')
+        const parent = checkbox.closest('[data-type]')
         const switchParent = parent.querySelector(`div[${attrName}]`)
         const inputs = switchParent.querySelectorAll('input, select, button').forEach(e => {
             if (checkbox.checked) {
@@ -163,19 +185,29 @@
       }
 
     function deleteStep(e) {
-        const parentDiv = e.closest('div[data-type]')
+        const parentDiv = e.closest('[data-type]')
         parentDiv.remove()
         reorderSteps()
       }
 
     function constructJSON(form) {
         let json = {}
+        const keysList = ['type', 'content', 'misc']
         form.querySelectorAll('div[id]:not([id="stepsList"])').forEach(e => {
             json[e.id] = {}
-            const actionType = e.getAttribute('data-type')
-            json[e.id]['action'] = actionType
+            json[e.id]['action'] = e.getAttribute('data-type')
+            keysList.forEach(i => {
+                const val = e.querySelector(`select[name="${i}"]:not(disabled), input[name="${i}"]:not(disabled)`)
+                if (val && val.value) {
+                    json[e.id][i] = val.value
+                  } else {
+                      json[e.id][i] = null
+                    }
+              })
           })
-    console.log(json)
+
+        const jsonPretty = JSON.stringify(json, null, 2);
+        document.querySelector('#json').innerHTML = jsonPretty
       }
 
     $(function() {
