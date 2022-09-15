@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'main',
     'user_profile',
-    'user_auth',
+    'authentication',
     'funnel',
 ]
 

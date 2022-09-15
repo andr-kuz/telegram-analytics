@@ -30,7 +30,7 @@ def handler(request):
                 return redirect('main:index')
         register_form = RegisterForm()
         login_form = LoginForm()
-        return render(request=request, template_name='user_auth/register_and_login.html', context={'register_form': register_form, 'login_form': login_form})
+        return render(request=request, template_name='authentication/register_and_login.html', context={'register_form': register_form, 'login_form': login_form})
     else:
         return redirect('main:index')
 
