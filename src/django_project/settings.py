@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'main',
     'user_profile',
     'user_auth',
-    'create_funnel',
+    'funnel',
 ]
 
 MIDDLEWARE = [

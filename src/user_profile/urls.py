@@ -5,5 +5,5 @@ app_name = 'user_profile'
 
 urlpatterns = [
     path('', views.index, name='index'),
-    path('create_funnel/', include('create_funnel.urls'))
+    path('funnel', include('funnel.urls')),
 ]
