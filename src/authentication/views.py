@@ -38,4 +38,4 @@ def handler(request):
 def log_out(request):
     if request.user.is_authenticated:
         logout(request)
-    return redirect('main:index')
+    return redirect('authentication:index')
