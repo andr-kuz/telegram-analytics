@@ -27,7 +27,7 @@ def handler(request):
             else:
                 login(request, user)
                 messages.success(request, 'Успешно' )
-                return redirect('main:index')
+                return redirect('profile:index')
         register_form = RegisterForm()
         login_form = LoginForm()
         return render(request=request, template_name='authentication/register_and_login.html', context={'register_form': register_form, 'login_form': login_form})

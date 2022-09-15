@@ -5,5 +5,6 @@ app_name = 'profile'
 
 urlpatterns = [
     path('', views.index, name='index'),
-    path('funnel', include('funnel.urls')),
+    path('funnel/', include('funnel.urls')),
+    path('userbot/', include('userbot.urls')),
 ]

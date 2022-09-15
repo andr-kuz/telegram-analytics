@@ -4,5 +4,5 @@ from . import views
 app_name = 'funnel'
 
 urlpatterns = [
-    path('', views.add, name='add'),
+    path('add', views.add, name='add'),
 ]
