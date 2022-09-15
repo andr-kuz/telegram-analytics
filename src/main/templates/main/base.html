@@ -18,9 +18,9 @@
     {% endif %}
     {% if user.is_authenticated %}
       <a href="{% url 'authentication:logout' %}">Разлогиниться</a><br>
-      <a href="{% url 'user_profile:index' %}">Профиль</a>
+      <a href="{% url 'profile:index' %}">Профиль</a>
     {% else %}
-      <a href="{% url 'user:index' %}">Залогиниться</a><br>
+      <a href="{% url 'authentication:index' %}">Залогиниться</a><br>
     {% endif %}
   </header>
   <main class="container">
