@@ -5,5 +5,9 @@
 {% block content %}
   <h1>Ваш профиль</h1>
   <h2>Ваши воронки:</h2>
+  {% if not userbots %}
+    <p>Прежде чем создать первую воронку, нужно подключить хотя бы одного User бота. <a href="{% url 'profile:userbot:add' %}">Вперёд!</a></p>
+  {% elif not funnels %}
   <p>У вас еще нет воронок. Давайте <a href="{% url 'profile:funnel:add' %}">Создадим первую</a></p>
+  {% endif %}
 {% endblock %}
