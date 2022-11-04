@@ -4,6 +4,7 @@ from django.contrib.auth import login, authenticate
 from django.contrib import messages
 from django.contrib.auth import logout
 from django.http import HttpResponse
+from django.contrib.auth.decorators import login_required
 
 def handler(request):
     if not request.user.is_authenticated:
@@ -35,7 +36,6 @@ def handler(request):
         return redirect('main:index')
 
 
+@login_required(login_url='authentication:index')
 def log_out(request):
-    if request.user.is_authenticated:
-        logout(request)
-    return redirect('authentication:index')
+    logout(request)
