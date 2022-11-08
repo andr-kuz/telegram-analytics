@@ -7,4 +7,7 @@ def index(request):
 
 @login_required(login_url='authentication:index')
 def add(request):
+    if request.method == 'POST':
+        answer = request.POST.getlist('answer')
+        pass
     return render(request=request, template_name='funnel/add.html')

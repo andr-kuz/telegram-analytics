@@ -49,7 +49,9 @@
           if (response.error) {
             for (const i in response.error) {
               const $item = document.querySelector(`#user_confirmation input:not([type="hidden"])[name="${i}"]`);
-              $item.classList.add('error');
+              if ($item) {
+                $item.classList.add('error');
+              }
               console.log(response.error[i])
             }
           }

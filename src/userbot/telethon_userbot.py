@@ -1,7 +1,7 @@
 from telethon import TelegramClient
 from telethon.sessions import StringSession
 import asyncio
-from telethon.errors.rpcerrorlist import SessionPasswordNeededError, PhoneNumberUnoccupiedError, ApiIdInvalidError, PhoneNumberInvalidError
+from telethon.errors.rpcerrorlist import SessionPasswordNeededError, PhoneNumberUnoccupiedError, ApiIdInvalidError, PhoneNumberInvalidError, FloodWaitError
 import pdb
 
 class Telethon:
@@ -30,19 +30,20 @@ class Telethon:
 
     def request_code(self):
         try:
-
             phone_hash = self.app.loop.run_until_complete(self.app.send_code_request(self.phone))
             self.phone_hash = phone_hash.phone_code_hash
             return self.phone_hash
-        except (ApiIdInvalidError, PhoneNumberInvalidError) as e:
+        except (ApiIdInvalidError, PhoneNumberInvalidError, FloodWaitError) as e:
             return e
 
     def send_confirmation(self, confirmation_code, password=''):
         try:
-            result = self.app.loop.run_until_complete(self.app.sign_in(phone=self.phone, code=confirmation_code, phone_code_hash=self.phone_hash, password=password))
+            if not password:
+                result = self.app.loop.run_until_complete(self.app.sign_in(phone=self.phone, code=confirmation_code, phone_code_hash=self.phone_hash))
+            else:
+                result = self.app.loop.run_until_complete(self.app.sign_in(password=password))
             return True
         except SessionPasswordNeededError as e:
-            pdb.set_trace()
             return e
         except PhoneNumberUnoccupiedError as e:
             return e
