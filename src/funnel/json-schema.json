@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "action": {
+        "type": "string",
+        "pattern": "(subscribe|reaction|comment|pm)"
+      },
+      "content": {
+        "type": ["string", "null"]
+      },
+      "type": {
+        "type": ["string", "null"]
+      },
+      "misc": {
+        "type": ["string", "null"]
+      }
+    },
+    "additionalProperties": false,
+    "allOf": [
+      {
+        "if": {
+          "properties": {"action": {"const": "subscribe"}}
+        },
+        "then": {
+          "properties": {
+            "content": {"pattern": "@.*"},
+            "type": {"type": ["null"]},
+            "misc": {"type": ["null"]}
+          }
+        },
+        "if": {
+          "properties": {"action": {"const": "comment"}}
+        },
+        "then": {
+          "properties": {
+            "content": {"type": ["string", "null"]},
+            "type": {"pattern": "(any|message|file|image|video)"},
+            "misc": {"type": ["string", "null"]}
+          }
+        },
+        "if": {
+          "properties": {"action": {"const": "reaction"}}
+        },
+        "then": {
+          "properties": {
+            "content": {"pattern": "(any|heart|fire)"},
+            "type": {"pattern": "(any|pm|post)"},
+            "misc": {"type": ["null"]}
+          }
+        },
+        "if": {
+          "properties": {"action": {"const": "pm"}}
+        },
+        "then": {
+          "properties": {
+            "content": {"type": ["null", "string"]},
+            "type": {"pattern": "(any|message|file|image|video)"},
+            "misc": {"pattern": "(from-person|to-person)"}
+          }
+        }
+      }
+    ]
+  },
+  "additionalProperties": false
+}

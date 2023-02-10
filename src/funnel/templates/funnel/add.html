@@ -16,10 +16,11 @@
 <h1>Создание воронки</h1>
 <div class="col-6 border">
   <div class="col-12 border p-3">
-    <form method="POST" onsubmit="constructJSON(this); return false">
+    <form method="POST" onsubmit="event.preventDefault(); constructJSON(this);">
+      {% csrf_token %}
       <div id="0" class="border p-3" data-type="subscribe">
-        <p>Введите название чата или канала, который хотите отслеживать</p>
-        <input type="text" placeholder="@mysuperchannel" name="track">
+        <p>Введите название вашего чата или канала, который хотите отслеживать</p>
+        <input type="text" placeholder="@mysuperchannel" name="content">
       </div>
       <div id="stepsList"></div>
       <button>Отправить</button>
@@ -89,19 +90,19 @@
       <input class="form-control" type="text" name="content" placeholder="Поддерживаются регулярные выражения" disabled>
     </div>
     <div class="form-check">
-      <input class="form-check-input" type="radio" name="misc" checked>
+      <input class="form-check-input" type="radio" name="misc" checked value="from-person">
       <label class="form-check-label">
         Сообщение от пользователя
       </label>
     </div>
     <div class="form-check">
-      <input class="form-check-input" type="radio" name="misc">
+      <input class="form-check-input" type="radio" name="misc" value="to-person">
       <label class="form-check-label">
         Сообщение пользователю
       </label>
     </div>
   </div>
-<div data-type="reaction" class="border p-3">
+  <div data-type="reaction" class="border p-3">
     <h2>Реакция</h2>
     <div class="mb-3">
       <label class="form-label">На что должна быть реакция</label>
@@ -113,7 +114,7 @@
     </div>
     <div class="mb-3">
       <label class="form-label">Какая реакция</label>
-      <select class="form-select" name="type">
+      <select class="form-select" name="content">
         <option value="any">Любая</option>
         <option value="heart">Heart</option>
         <option value="fire">Fire</option>
@@ -123,100 +124,119 @@
 </div>
 <script>
   document.querySelectorAll('[onchange]').forEach(e => {
-      e.onchange()
+    e.onchange()
+  })
+  const stepsList = document.querySelector('#stepsList')
+
+  function typeChanged(select, attrName) {
+    const parent = select.closest('[data-type]')
+    const changeName = select.value
+    const switchParent = parent.querySelector(`div[${attrName}]`)
+    switchParent.querySelectorAll(':scope *').forEach(e => {
+      e.classList.add('d-none')
+      if (e.hasAttribute(`data-${changeName}`)) {
+        e.classList.remove('d-none')
+      }
     })
-    const stepsList = document.querySelector('#stepsList')
+  }
 
-    function typeChanged(select, attrName) {
-        const parent = select.closest('[data-type]')
-        const changeName = select.value
-        const switchParent = parent.querySelector(`div[${attrName}]`)
-        switchParent.querySelectorAll(':scope *').forEach(e => {
-            e.classList.add('d-none')
-            if (e.hasAttribute(`data-${changeName}`)) {
-                e.classList.remove('d-none')
-              }
-          })
+  function switchAvailability(checkbox, attrName) {
+    const parent = checkbox.closest('[data-type]')
+    const switchParent = parent.querySelector(`div[${attrName}]`)
+    const inputs = switchParent.querySelectorAll('input, select, button').forEach(e => {
+      if (checkbox.checked) {
+        e.disabled = false;
+      } else {
+        e.disabled = true;
       }
+    })
+  }
 
-    function switchAvailability(checkbox, attrName) {
-        const parent = checkbox.closest('[data-type]')
-        const switchParent = parent.querySelector(`div[${attrName}]`)
-        const inputs = switchParent.querySelectorAll('input, select, button').forEach(e => {
-            if (checkbox.checked) {
-                e.disabled = false;
-              } else {
-                  e.disabled = true;
-                }
-          })
+  function reorderSteps() {
+    let i = 1
+    const thereAreSteps = stepsList.querySelectorAll(':scope > div')
+    if (thereAreSteps) {
+      thereAreSteps.forEach(e => {
+        e.id = i
+        i += 1
+      })
+    }
+  }
+
+  function addStep(form) {
+    reorderSteps()
+    const formData = new FormData(form)
+    for (const pair of formData.entries()) {
+      if (pair[0] == "add-step-select") {
+        let lastStep = stepsList.querySelector(":scope > div:last-of-type")
+        if (!lastStep) {
+          lastStep = document.querySelector("div[id='0']")
+        }
+        const lastId = lastStep.id
+        const lastClassName = lastStep.className
+        const element = document.querySelector(`#reference [data-type="${pair[1]}"]`)
+        const nextStep = element.cloneNode(true)
+        nextStep.id = parseInt(lastId) + 1
+        let elementText = nextStep.innerHTML
+        elementText += "<button type='button' onclick='deleteStep(this)'>X</button>"
+        nextStep.innerHTML = elementText
+        stepsList.append(nextStep)
       }
+    }
+  }
 
-    function reorderSteps() {
-        let i = 1
-        const thereAreSteps = stepsList.querySelectorAll(':scope > div')
-        if (thereAreSteps) {
-            thereAreSteps.forEach(e => {
-                e.id = i
-                i += 1
-              })
-          }
+  function deleteStep(e) {
+    const parentDiv = e.closest('[data-type]')
+    parentDiv.remove()
+    reorderSteps()
+  }
+
+  function constructJSON(form) {
+    const json = []
+    const keysList = ["content", "type", "misc"]
+    form.querySelectorAll("div[id]:not([id='stepsList'])").forEach(e => {
+      const obj = {}
+      obj["action"] = e.getAttribute("data-type")
+      keysList.forEach(i => {
+        const val = e.querySelector(`select[name="${i}"]:not(disabled), input[name="${i}"][type="radio"]:checked:not(disabled), input[name="${i}"]:not(disabled):not([type="radio"])`)
+        if (val && val.value) {
+          obj[i] = val.value
+        } else {
+          obj[i] = null
+        }
+      })
+      json.push(obj)
+    })
+
+    const jsonString = JSON.stringify(json);
+    sendJSON(jsonString);
+  }
+
+  function sendJSON(jsonString) {
+    const token = document.querySelector("input[name='csrfmiddlewaretoken']").value
+    const data = new FormData();
+    data.append("csrfmiddlewaretoken", token);
+    data.append("json_data", jsonString);
+
+    const xhr = new XMLHttpRequest()
+    xhr.open("POST", "", true)
+    xhr.send(data)
+    xhr.onload = function() {
+      if (xhr.status != 200) { 
+        alert(`Ошибка ${xhr.status}: ${xhr.statusText}`)
+      } else {
+        console.log(xhr.response)
       }
+    }
+  }
 
-    function addStep(form) {
+  $(function() {
+    $(stepsList).sortable({
+      axis: "y",
+      out: function (event, ui) {
         reorderSteps()
-        const formData = new FormData(form)
-        for (const pair of formData.entries()) {
-            if (pair[0] == 'add-step-select') {
-                let lastStep = stepsList.querySelector(':scope > div:last-of-type')
-                if (!lastStep) {
-                    lastStep = document.querySelector('div[id="0"]')
-                  }
-                const lastId = lastStep.id
-                const lastClassName = lastStep.className
-                const element = document.querySelector(`#reference [data-type="${pair[1]}"]`)
-                const nextStep = element.cloneNode(true)
-                nextStep.id = parseInt(lastId) + 1
-                let elementText = nextStep.innerHTML
-                elementText += '<button type="button" onclick="deleteStep(this)">X</button>'
-                nextStep.innerHTML = elementText
-                stepsList.append(nextStep)
-              }
-          }
       }
-
-    function deleteStep(e) {
-        const parentDiv = e.closest('[data-type]')
-        parentDiv.remove()
-        reorderSteps()
-      }
-
-    function constructJSON(form) {
-        let json = {}
-        const keysList = ['type', 'content', 'misc']
-        form.querySelectorAll('div[id]:not([id="stepsList"])').forEach(e => {
-            json[e.id] = {}
-            json[e.id]['action'] = e.getAttribute('data-type')
-            keysList.forEach(i => {
-                const val = e.querySelector(`select[name="${i}"]:not(disabled), input[name="${i}"]:not(disabled)`)
-                if (val && val.value) {
-                    json[e.id][i] = val.value
-                  } else {
-                      json[e.id][i] = null
-                    }
-              })
-          })
-
-        const jsonPretty = JSON.stringify(json, null, 2);
-        document.querySelector('#json').innerHTML = jsonPretty
-      }
-
-    $(function() {
-        $(stepsList).sortable({
-            axis: "y",
-            out: function (event, ui) {
-                reorderSteps()
-              }
-          });
-      });
+    });
+  });
 </script>
 {% endblock %}

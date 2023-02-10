@@ -43,9 +43,7 @@ class Telethon:
             else:
                 result = self.app.loop.run_until_complete(self.app.sign_in(password=password))
             return True
-        except SessionPasswordNeededError as e:
-            return e
-        except PhoneNumberUnoccupiedError as e:
+        except (SessionPasswordNeededError | PhoneNumberUnoccupiedError) as e:
             return e
 
     def get_session_string(self):
