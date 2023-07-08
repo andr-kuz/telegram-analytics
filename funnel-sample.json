@@ -1,18 +1,14 @@
-{
-  "comment": {
-    "type": "post",
-    "content": null
-    "misc": "https://t.me/open_source_friend/1781"
+[
+  {
+    "action": "subscribe",
+    "content": "@test",
+    "type": null,
+    "misc": null
   },
-  "pm": {
+  {
+    "action": "pm",
+    "content": null,
     "type": "message",
-    "content": null
-    "misc": true
-  },
-  "pm": {
-    "type": "reaction",
-    "content": "🔥"
-    "misc": false
+    "misc": "from-person"
   }
-}
-
+]
